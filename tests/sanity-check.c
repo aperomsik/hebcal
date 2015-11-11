@@ -1,3 +1,4 @@
+#ifndef ANDROID_NDK
 /*
   $Header$
   sanity checker.  Looks for the "august tishri" problem
@@ -66,3 +67,4 @@ int main(int argc, char*argv[])
     printf("found %d failure cases\n",retVal);
     exit( retVal );
 }
+#endif /* ! defined ANDROID_NDK */
