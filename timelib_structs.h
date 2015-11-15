@@ -131,8 +131,10 @@ typedef uint64_t timelib_ulong;
 # define TIMELIB_LONG_MAX INT64_MAX
 # define TIMELIB_LONG_MIN INT64_MIN
 # define TIMELIB_ULONG_MAX UINT64_MAX
+#ifndef __ANDROID__
 # define TIMELIB_LONG_FMT "%" PRId64
 # define TIMELIB_ULONG_FMT "%" PRIu64
+#endif
 #else
 typedef int32_t timelib_long;
 typedef uint32_t timelib_ulong;

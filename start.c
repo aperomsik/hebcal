@@ -269,6 +269,7 @@ void localize_to_city(const char *cityNameArg)
             free(cityStr);
             initStr(&cityName, strlen(pcity->name));
             strcpy(cityName, pcity->name);
+            ok_to_run = 1;
             return;
       }
 
@@ -747,3 +748,37 @@ int main(int argc, char* argv[])
     else
         return 1;
 }
+
+int hebcal_for_range(date_t in_date, int num_days, int zemanim) {
+   /* eventually some of this should be configurable */
+   date_t tempDate;
+   long absdate;
+   int prev_year = theYear;
+   rangeType = DAY;
+   printHebDates_sw = 1;
+   noGreg_sw = 1;
+   shortGreg_sw = (num_days > 1);
+   weekday_sw = 1;
+   printOmer_sw = 1;
+   sedrot_sw = 1;
+   candleLighting_sw = 1;
+   abbrev_sw = 1;
+   absdate = greg2abs(in_date);
+   tempDate = abs2hebrew(absdate);
+   yearDirty = (tempDate.yy != prev_year);
+
+    default_zemanim = zemanim;
+
+   if (ok_to_run)
+   {
+      init_holidays(tempDate.yy);	/* load the holiday array */
+      main_calendar(absdate, absdate + num_days - 1);
+      return 1;			/* success!  Kol hakavod to thorough programmers */
+   }
+   else
+      return 0;
+}
+int hebcal_for_date(date_t in_date) {
+   return hebcal_for_range(in_date, 1, 0);
+}
+

@@ -15,7 +15,7 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFNGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -261,6 +261,7 @@ static void read_location(const unsigned char **tzf, timelib_tzinfo *tz)
 
 void timelib_dump_tzinfo(timelib_tzinfo *tz)
 {
+#ifndef __ANDROID__
 	uint32_t i;
 
 	printf("Country Code:      %s\n", tz->location.country_code);
@@ -300,6 +301,7 @@ void timelib_dump_tzinfo(timelib_tzinfo *tz)
 			(long) tz->leap_times[i].trans,
 			tz->leap_times[i].offset);
 	}
+#endif /* ! ANDROID */
 }
 
 static int seek_to_tz_position(const unsigned char **tzf, char *timezone, const timelib_tzdb *tzdb)

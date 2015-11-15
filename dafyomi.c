@@ -138,8 +138,7 @@ void hebcal_dafyomi( date_t *greg_day  )
            iso8859_8_sw ? shas[count].hname :
              ashkenazis_sw ? shas[count].aname : shas[count].sname,
            blatt );
-   PrintGregDate(*greg_day);
-   printf("%s\n", buffer);
+   DeclareEvent( greg_day, NULL, buffer, 1 );
 }
 
    

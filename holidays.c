@@ -462,6 +462,7 @@ static void load_variable_holidays( int hYear )
         tmpholp->typeMask = CHANUKAH_CANDLES;
         PushHoliday (tmpholp, &var_holidays[TEVET][2]);
         tmpholp->name = HOLIDAY_CHANUKAH_8TH_DAY;
+        tmpholp->typeMask = 0;
         PushHoliday (tmpholp, &var_holidays[TEVET][3]);
     }
     else
@@ -473,6 +474,7 @@ static void load_variable_holidays( int hYear )
         tmpholp->typeMask = CHANUKAH_CANDLES;
         PushHoliday (tmpholp, &var_holidays[TEVET][1]);
         tmpholp->name = HOLIDAY_CHANUKAH_8TH_DAY;
+        tmpholp->typeMask = 0;
         PushHoliday (tmpholp, &var_holidays[TEVET][2]);
     }
 

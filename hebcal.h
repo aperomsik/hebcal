@@ -167,5 +167,12 @@ void reset_Omer( int hYear );
 void DeclareEvent(date_t *, htime_t *, char *, int);
 extern const char * license[];
 extern const char * warranty[];
+
+#ifdef __ANDROID__
+extern int hca_printf(const char *fmt, ...);
+#define printf hca_printf
+#define puts(_s) hca_printf("%s\n", _s)
+#endif
+
 #endif
 

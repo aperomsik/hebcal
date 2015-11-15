@@ -157,9 +157,9 @@ void PrintGregDate( date_t dt )
             printf ("%d", dt.yy);
         
         if (tabs_sw)
-            putchar ('\t');
+          printf ("\t");
         else
-            putchar (' ');
+          printf (" ");
     }
     
     if (shortGreg_sw)

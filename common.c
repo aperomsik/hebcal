@@ -205,9 +205,9 @@ date_t abs2hebrew( long d )
 
     if( d >= 10555144L )
     {
-        fprintf(stderr, "parameter to abs2hebrew  %ld out of range\n", 
-                d );
-        exit(1);
+       char buf[40];
+       sprintf(buf, "%ld", d);
+       die("parameter to abs2hebrew %s out of range", buf);
     }
     
     gregdate = abs2greg (d);
@@ -241,9 +241,10 @@ date_t abs2hebrew( long d )
     day = (int) (d - hebrew2abs (hebdate) + 1L);
     if( day < 0)
     {
-        fprintf(stderr, "assertion failure d < hebrew2abs(m,d,y) => %ld < %ld!\n", 
+       char buf[100];
+       sprintf(buf, "assertion failure d < hebrew2abs(m,d,y) => %ld < %ld!\n", 
                 d, hebrew2abs(hebdate));
-        exit(1);
+       die(buf, NULL);
     }
 
     hebdate.dd = day;
