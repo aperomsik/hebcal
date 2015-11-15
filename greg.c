@@ -43,6 +43,12 @@ const char *eMonths[] =
     "January", "February", "March", "April", "May", "June", "July",
     "August", "September", "October", "November", "December"
 };
+const char *shortMonthNames[] =
+{
+    "UNUSED",
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
+    "Aug", "Sep", "Oct", "Nov", "Dec"
+};
 
 int MonthLengths[][13] =
 {

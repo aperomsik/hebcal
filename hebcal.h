@@ -64,6 +64,7 @@ extern int
     sedraAllWeek_sw, 
     sedrot_sw, 
     noGreg_sw, 
+    shortGreg_sw,
     noHolidays_sw,
     suppress_rosh_chodesh_sw,
     tabs_sw,
@@ -71,6 +72,7 @@ extern int
     abbrev_sw,
     yearDigits_sw,
     yahrtzeitFile_sw,
+    printf_sw,
    default_zemanim;
 extern int twentyFourHour_sw;
 
@@ -126,6 +128,29 @@ typedef struct hsnode{  /* holiday storage structure */
 #define ZMAN_TZAIT_72       (1 << 13)
 #define ZMAN_HAVDALAH       (1 << 14)
 
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+typedef struct htime {
+   int hours;
+   int minutes;
+   int pm;
+} htime_t;
+
+typedef struct hc_event {
+  int mm;
+  int dd;
+  int yy;
+  int daf_flag;
+  htime_t time;
+  char *desc;
+} HebcalEvent;
+
 year_t yearData( int );
 date_t nextHebDate( date_t );
 date_t prevHebDate( date_t );
@@ -139,7 +164,7 @@ void main_calendar( long,long );
 void print_candlelighting_times( int, int, date_t );
 void print_sunrise_sunset(date_t);
 void reset_Omer( int hYear );
-
+void DeclareEvent(date_t *, htime_t *, char *, int);
 extern const char * license[];
 extern const char * warranty[];
 #endif

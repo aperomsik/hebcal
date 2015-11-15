@@ -11,6 +11,7 @@
 #define strEQ(X,Y) (0 == strcmp((X),(Y)))
 
 void initStr( char **, size_t );
+void makeStr( char **s, char *src );
 int isAllNums( const char * );
 const char *numSuffix( int );
 char *hc_itoa( int );

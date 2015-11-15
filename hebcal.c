@@ -45,6 +45,7 @@
 int
   ashkenazis_sw, candleLighting_sw, euroDates_sw, hebrewDates_sw, inputFile_sw,
   israel_sw, latlong_sw, printOmer_sw, printMolad_sw, printSunriseSunset_sw, sedraAllWeek_sw, sedrot_sw, noGreg_sw,
+  shortGreg_sw,
   printHebDates_sw, printSomeHebDates_sw, noHolidays_sw, tabs_sw, weekday_sw,  suppress_rosh_chodesh_sw,
   sunsetAlways_sw, sunriseAlways_sw, default_zemanim,  
   abbrev_sw, first_weekday, this_weekday,
@@ -53,9 +54,12 @@ int
 timelib_tzinfo *TZ_INFO;
 int latdeg, latmin, longdeg, longmin;
 
+
 int iso8859_8_sw;
 int twentyFourHour_sw;
 long beginOmer, endOmer;
+int printf_sw = 1;
+extern hmonths_t hMonths;
 FILE *inFile, *yFile;
 char *formatString;
 extern holstorep_t holidays[14][MAXDAYS], union_Adar[MAXDAYS];
@@ -63,6 +67,9 @@ extern holstorep_t holidays[14][MAXDAYS], union_Adar[MAXDAYS];
 #define SIMCHAT_DAY 23
 int havdalah_minutes = 72;      /* default */
 int light_offset = -18;         /* outside jerusalem */
+
+extern const char *shortMonthNames[];
+
 
 /*-------------------------------------------------------------------------*/
 
@@ -155,8 +162,16 @@ void PrintGregDate( date_t dt )
             putchar (' ');
     }
     
+    if (shortGreg_sw)
+    {
     if (weekday_sw)
-        printf ("%s, ", ShortDayNames[dayOfWeek (dt)]);
+        printf ("%s ", ShortDayNames[dayOfWeek (dt)]);
+      printf("%d-%s: ", dt.dd, shortMonthNames[dt.mm]);
+    }
+    else if (weekday_sw)
+      printf ("%s, ", ShortDayNames[dayOfWeek (dt)]);
+
+    
 }
 
 /*-------------------------------------------------------------------------*/
@@ -301,6 +316,7 @@ void print_candlelighting_times( int mask, int weekday, date_t todayGreg)
     int i_zman;
     double var_hr_hours = 0.0, day_span;
     char *zman_name;
+    htime_t adj_time;
  
     rs = get_rise_set(todayGreg, &h_rise, &h_set, &gmt_offset);
     if (rs != 0) {
@@ -340,24 +356,17 @@ void print_candlelighting_times( int mask, int weekday, date_t todayGreg)
            N -= floor(N / 24) * 24;
        }
        
-       hour = (int) N;
-       pm = (hour > 11);
-       if (hour > 12 && !twentyFourHour_sw) {
-           hour = hour % 12;
+       adj_time.hours = (int) N;
+       adj_time.pm = (adj_time.hours > 11);
+       if (adj_time.hours > 12 && !twentyFourHour_sw) {
+           adj_time.hours = adj_time.hours % 12;
        }
-       minute = (int) (60 * (N - (int) N));
+       adj_time.minutes = (int) (60 * (N - (int) N));
        
-       PrintGregDate (todayGreg);
        zman_name = iso8859_8_sw ? zemanim[i_zman].name_8859_8 :
           ashkenazis_sw ? zemanim[i_zman].name_ashk :
-             zemanim[i_zman].name_sfrd;
-       if (twentyFourHour_sw) 
-         printf ("%s: %2d:%02d\n", zman_name, hour,
-                 minute);
-       else
-         printf ("%s: %2d:%02d %s\n", zman_name, hour,
-                 minute, pm ? "pm": "am" );
-         
+             zemanim[i_zman].name_sfrd;         
+       DeclareEvent( &todayGreg, &adj_time, zman_name, 0 );
     }
 }
 
@@ -464,12 +473,13 @@ void main_calendar( long todayAbs, long endAbs) /* the range of the desired prin
            (holidays_today || sedra_today || omer_today || 
             (today_zemanim & (ZMAN_CANDLES_BEFORE|ZMAN_CANDLES_AFTER|ZMAN_HAVDALAH)))))
       {
-          PrintGregDate (todayGreg);
-          printf ("%d%s%s %s, %d\n", todayHeb.dd,       /* print the hebrew date */
+          sprintf (buffer, "%d%s%s %s, %d",
+                   todayHeb.dd,       /* print the hebrew date */
                   iso8859_8_sw ? "" : numSuffix( todayHeb.dd ),
                   iso8859_8_sw ? "" : " of",
                   LANGUAGE2(hMonths[LEAP_YR_HEB( todayHeb.yy )][todayHeb.mm].name),
                   todayHeb.yy);
+          DeclareEvent (&todayGreg, NULL, buffer, 0);
       }
       
       if (printSunriseSunset_sw)
@@ -484,11 +494,11 @@ void main_calendar( long todayAbs, long endAbs) /* the range of the desired prin
           int foundSedra = sedra( todayAbs, sedraStr, 40 );
           if (foundSedra)
           {
-              PrintGregDate( todayGreg );
-              printf( "%s %s\n",
+              sprintf(buffer, "%s %s",
                       iso8859_8_sw ? "\364\370\371\372" :
                       ashkenazis_sw ? "Parshas" : "Parashat",
                       sedraStr );
+              DeclareEvent( &todayGreg, NULL, buffer, 0 );
           }
       }
       
@@ -498,18 +508,15 @@ void main_calendar( long todayAbs, long endAbs) /* the range of the desired prin
       {
           if (!noHolidays_sw || (holip->typeMask & USER_EVENT))
           {
-/*              char buf[200];
-              puts(formatLine( todayGreg, todayHeb, holip->name, buf, 200));
-*/
-              PrintGregDate( todayGreg ); 
-              puts( holip->name ); 
+              DeclareEvent( &todayGreg, NULL, holip->name, 0 );
           }
       }
       
       /* Print the Omer */
       if (INCLUDE_TODAY(omer_today))
       {
-          initStr (&omerStr, NM_LEN);
+          char omerStr[NM_LEN];
+          omerStr[0] = '\0';
           omer = (int) (todayAbs - beginOmer + 1L);
           if (!tabs_sw)
           {
@@ -522,9 +529,7 @@ void main_calendar( long todayAbs, long endAbs) /* the range of the desired prin
               strncat (omerStr, "Omer: ", NM_LEN);
               strncat (omerStr, hc_itoa (omer), NM_LEN);
           }
-          PrintGregDate (todayGreg);
-          printf ("%s\n", omerStr);
-          free( omerStr );
+          DeclareEvent( &todayGreg, NULL, omerStr, 0 );
       }
       
       if (INCLUDE_TODAY(dafYomi_sw))
@@ -556,11 +561,63 @@ void main_calendar( long todayAbs, long endAbs) /* the range of the desired prin
       incHebGregDate (&todayHeb, &todayGreg, &todayAbs, &day_of_week, &theYear);
       
 #     ifdef PLUG_LEAKS
-      free_holidays(*holip);
+      freeHolidays(&holi_start);
 #     endif
     }
 #undef INCLUDE_TODAY
 }
 
+#define MAX_EV 200
+HebcalEvent events[MAX_EV];
+int num_events = 0;
 
+void clean_events()
+{
+  int i;
+  for (i = 0; i < num_events; i ++)
+    if (events[i].desc != NULL)
+      {
+        free(events[i].desc);
+        events[i].desc = NULL;
+      }
+  num_events = 0;
+}
+
+void DeclareEvent(date_t *date, htime_t *time, char *description,
+                  int daf_flag)
+{
+
+  if (printf_sw)
+    {
+      PrintGregDate(*date);
+      printf("%s", description);
+      if (time)
+        {
+          printf (": %2d:%02d %s", time->hours, time->minutes,
+                      time->pm ? "pm": "am" );
+        }
+      printf("\n");
+    }
+  else
+    {
+      int i_ev = num_events;
+      if (i_ev == MAX_EV)
+        return;
+      num_events ++;
+      events[i_ev].mm = date->mm;
+      events[i_ev].dd = date->dd;
+      events[i_ev].yy = date->yy;
+      if (time == NULL)
+        {
+          events[i_ev].time.hours = 
+            events[i_ev].time.minutes = 
+            events[i_ev].time.pm = 
+            0;
+        }
+      else
+        events[i_ev].time = *time;
+      events[i_ev].daf_flag = daf_flag;
+      makeStr(&events[i_ev].desc, description);
+    }
+}
 

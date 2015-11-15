@@ -152,6 +152,27 @@ static char
    "            https://github.com/hebcal/hebcal"
 };
 
+static char **city_names = NULL;
+
+int get_city_data(char **r_cur_city_name, char ***r_all_cities)
+{
+   int n_cities = sizeof(cities) / sizeof(city_t) - 1;
+   if (city_names == NULL)
+   {
+      int i_city;
+      city_names = (char**)malloc(n_cities * sizeof(char*));
+      for (i_city = 0; i_city < n_cities; i_city ++)
+      {
+         city_names[i_city] = cities[i_city].name;
+      }
+   }
+   if (r_cur_city_name != NULL)
+      *r_cur_city_name = cityName;
+   if (r_all_cities != NULL)
+      *r_all_cities = city_names;
+   return n_cities;
+}
+
 void print_version_data(void)
 {
     printf("hebcal version " VERSION "\n");
@@ -253,6 +274,7 @@ void localize_to_city(const char *cityNameArg)
 
     warn("unknown city: %s. Use a nearby city or geographic coordinates.", cityNameArg);
     warn("run 'hebcal cities' for a list of cities.", "");
+    free(cityStr);
     ok_to_run = 0;
 }
 
@@ -588,6 +610,16 @@ void handleArgs(int argc, char *argv[])
    }
 }
 
+void freeCityName()
+{
+   if (cityName)
+   {
+      free(cityName);
+      cityName = NULL;
+   }
+   if (city_names)
+      free(city_names);
+}
 
 int tokenize(char *str, int *pargc, char* argv[])
 {

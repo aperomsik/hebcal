@@ -39,6 +39,12 @@ void initStr( char **s, size_t size )
     **s = '\0';
 }
 
+void makeStr( char **s, char *src )
+{
+  initStr(s, strlen(src));
+  strcpy(*s, src);
+}
+
 /* istrncasecmp performs a signed, case-insensitive comparison
    of s1 to s2, for a maximum length of n  bytes. */
 int istrncasecmp( size_t n, const char *s1, const char *s2 )
